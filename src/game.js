@@ -1,0 +1,59 @@
+var Game = function () {
+  var self = this;
+  var element = document.getElementById('game');
+  var world = new World(element.width, element.height);
+  var renderTarget = new RenderTarget(element, 8.0);
+  var compositeTarget = new CompositeRenderer(element);
+
+  var doLogic = function () {
+    world.doLogic();
+  };
+
+  var renderScene = function () {
+    clearRenderingTarget();
+    world.render(renderTarget);
+    compositeTarget.renderScene(renderTarget.colourTarget(), renderTarget.depthTarget());
+  };
+
+  var clearRenderingTarget = function () {
+    renderTarget.fillRect(0, 0, 0, element.width, element.height, 'black');
+  };
+
+  self.start = function () {
+    setInterval(doLogic, 1000 / 30);
+    setInterval(renderScene, 1000 / 30);
+  };
+
+  var populateWorldWithJunk = function () {
+    for (var x = 0; x < 1000; x++) {
+      world.addEntity(0, randomPointInWidth(), randomPointInHeight(), randomWidth(), randomHeight(), '#FF0000');
+    };
+    for (var x = 0; x < 200; x++) {
+      world.addEntity(1, randomPointInWidth(), randomPointInHeight(), randomWidth(), randomHeight(), '#0000FF');
+    };
+    for (var x = 0; x < 50; x++) {
+      world.addEntity(2, randomPointInWidth(), randomPointInHeight(), randomWidth(), randomHeight(), '#FF00FF');
+    };
+    for (var x = 0; x < 25; x++) {
+      world.addEntity(3, randomPointInWidth(), randomPointInHeight(), randomWidth(), randomHeight(), '#FF1111');
+    };
+  };
+
+  var randomPointInWidth = function () {
+    return Math.random() * element.width;
+  };
+
+  var randomPointInHeight = function () {
+    return Math.random() * element.height;
+  };
+
+  var randomWidth = function () {
+    return Math.random() * 30;
+  };
+
+  var randomHeight = function () {
+    return Math.random() * 30;
+  };
+
+  populateWorldWithJunk();
+};
