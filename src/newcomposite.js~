@@ -24,11 +24,11 @@ var Effect = function(gl, program) {
     gl.enableVertexAttribArray(aTextureCoords);
   };
 
-  self.camera = function(camera) {
-    gl.uniformMatrix4fv(uProjection, false, camera.projection);
-    gl.uniformMatrix4fv(uView, false, camera.view);
-    gl.uniformMatrix4fv(uWorld, false, camera.world);
-    gl.uniform2f(uResolution, false, camera.resolution);
+  self.camera = function(projection, view, world, resolution) {
+    gl.uniformMatrix4fv(uProjection, false, projection);
+    gl.uniformMatrix4fv(uView, false, view);
+    gl.uniformMatrix4fv(uWorld, false, world);
+    gl.uniform2f(uResolution, false, resolution);
   };
 
   self.inputTextures = function(inputColour, depth) {
@@ -46,26 +46,6 @@ var Effect = function(gl, program) {
   };
 };
 
-var Camera = function() {
-  var self = this;
-
-  self.projection = mat4.create();
-  self.view = mat4.create();
-  self.world = mat4.create();
-  self.resolution = new glMatrixArrayType(2);
-
-  self.update = function(renderWidth, renderHeight) {
-    mat4.ortho(0, renderWidth, renderHeight, 0, -1, 1, self.projection);
-    mat4.lookAt([0, 0, 0], [0, 0, -1], [0, 1, 0], self.view);
-    mat4.identity(self.world);
-    mat4.scale(self.world, [renderWidth, renderHeight, 1.0]);
-    
-    self.resolution[0] = renderWidth;
-    self.resolution[1] = renderHeight;
-  };
-
-};
-
 var CompositeRenderer = function (target) {
   var self = this;
 
@@ -76,13 +56,19 @@ var CompositeRenderer = function (target) {
 
   var renderWidth = 0;
   var renderHeight = 0;
-  var camera = new Camera();
-
 
   self.renderScene = function (colourCanvas, depthCanvas) {
     gl.viewport(0, 0, renderWidth, renderHeight);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    camera.update(renderWidth, renderHeight);
+
+
+
+    var projectionMatrix = mat4.ortho(0, renderWidth, renderHeight, 0, -1, 1);
+    var viewMatrix = mat4.lookAt([0, 0, 0], [0, 0, -1], [0, 1, 0]);
+
+    var worldMatrix = mat4.create();
+    mat4.identity(worldMatrix);
+    mat4.scale(worldMatrix, [renderWidth, renderHeight, 1.0]);
 
     // create textures from inputs
     var colourTexture = createTextureFromCanvas(colourCanvas);
@@ -90,7 +76,7 @@ var CompositeRenderer = function (target) {
 
     basicEffect.begin();
     basicEffect.buffers(vertexBuffer, textureBuffer);
-    basicEffect.camera(camera);
+    basicEffect.camera(projectionMatrix, viewMatrix, worldMatrix, [renderWidth, renderHeight]);
     basicEffect.inputTextures(colourTexture, depthTexture);
     basicEffect.render();
 

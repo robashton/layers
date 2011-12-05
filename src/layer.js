@@ -2,11 +2,11 @@ var Layer = function (depth, sceneWidth) {
   var self = this;
   var entities = [];
 
-  self.addEntity = function (x, y, width, height, colour) {
+  self.addEntity = function (x, y, width, height, material) {
     entities.push({
       width: width * (depth / 5.0),
       height: height * (depth / 5.0),
-      colour: colour,
+      material: material,
       x: x,
       y: y
     });
@@ -31,7 +31,7 @@ var Layer = function (depth, sceneWidth) {
 
   var renderEntity = function (context, i) {
     var entity = entities[i];
-    context.fillRect(entity.x, entity.y, depth, entity.width, entity.height, entity.colour);
+    context.fillRect(entity.x, entity.y, depth, entity.width, entity.height, entity.material);
   };
 };
 

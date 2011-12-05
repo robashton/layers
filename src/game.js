@@ -16,7 +16,7 @@ var Game = function () {
   };
 
   var clearRenderingTarget = function () {
-    renderTarget.fillRect(0, 0, 0, element.width, element.height, 'black');
+    renderTarget.fillRect(0, 0, 0, element.width, element.height, new Material(0,0,0));
   };
 
   self.start = function () {
@@ -26,16 +26,16 @@ var Game = function () {
 
   var populateWorldWithJunk = function () {
     for (var x = 0; x < 1000; x++) {
-      world.addEntity(0, randomPointInWidth(), randomPointInHeight(), randomWidth(), randomHeight(), '#FF0000');
+      world.addEntity(0, randomPointInWidth(), randomPointInHeight(), randomWidth(), randomHeight(), new Material(255,0,0));
     };
     for (var x = 0; x < 200; x++) {
-      world.addEntity(1, randomPointInWidth(), randomPointInHeight(), randomWidth(), randomHeight(), '#0000FF');
+      world.addEntity(1, randomPointInWidth(), randomPointInHeight(), randomWidth(), randomHeight(), new Material(0,0,255));
     };
     for (var x = 0; x < 50; x++) {
-      world.addEntity(2, randomPointInWidth(), randomPointInHeight(), randomWidth(), randomHeight(), '#FF00FF');
+      world.addEntity(2, randomPointInWidth(), randomPointInHeight(), randomWidth(), randomHeight(), new Material(255,0,255));
     };
     for (var x = 0; x < 25; x++) {
-      world.addEntity(3, randomPointInWidth(), randomPointInHeight(), randomWidth(), randomHeight(), '#FF1111');
+      world.addEntity(3, randomPointInWidth(), randomPointInHeight(), randomWidth(), randomHeight(), new Material(255,30,30));
     };
   };
 

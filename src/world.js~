@@ -17,8 +17,8 @@ var World = function (sceneWidth, sceneHeight) {
       layers[i].render(context);
   };
 
-  self.addEntity = function (layer, width, height, x, y, colour) {
-    layers[layer].addEntity(width, height, x, y, colour);
+  self.addEntity = function (layer, width, height, x, y, material) {
+    layers[layer].addEntity(width, height, x, y, material);
   };
 };
 
