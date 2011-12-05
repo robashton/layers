@@ -1,0 +1,1 @@
+This is an experiment that might turn into a little library for folk (including myself) to use in creating 2D parallax scrolling games with WebGL to perform progressive enhancement on top.
