@@ -1,42 +1,42 @@
 ﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <title></title>
-    <script src="jquery-1.4.1.js" type="text/javascript"></script>
-    <script src="glmatrix.js" type="text/javascript"></script>
+  <title></title>
+  <script src="jquery-1.4.1.js" type="text/javascript"></script>
+  <script src="glmatrix.js" type="text/javascript"></script>
 
-    <script src="src/rendertarget.js" type="text/javascript"></script>
-    <script src="src/compositerenderer.js" type="text/javascript"></script>
-    <script src="src/layer.js" type="text/javascript"></script>
-    <Script src="src/world.js" type="text/javascript"></script>
-    <script src="src/game.js" type="text/javascript"></script>
+  <script src="src/rendertarget.js" type="text/javascript"></script>
+  <script src="src/compositerenderer.js" type="text/javascript"></script>
+  <script src="src/layer.js" type="text/javascript"></script>
+  <Script src="src/world.js" type="text/javascript"></script>
+  <script src="src/game.js" type="text/javascript"></script>
 
-    <script type="text/javascript">
-        $(document).ready(function () {
-            var game = new Game();
-            game.start();
-        });
-    </script>
-    <style>
-        body div
-        {
-            float: left;
-            margin-left: 5px;
-        }
-    </style>
+  <script type="text/javascript">
+    $(document).ready(function () {
+      var game = new Game();
+      game.start();
+    });
+  </script>
+  <style>
+    body div
+    {
+      float: left;
+      margin-left: 5px;
+    }
+  </style>
 </head>
 <body>
-    <div id="container">
-        <canvas id="game" width="320" height="320">
+  <div id="container">
+    <canvas id="game" width="320" height="320">
 
-        </canvas>
-    </div>
-    <div id="scratch">
-        
-    </div>
-    <div id="compositeContainer">
-        
-    </div>
+    </canvas>
+  </div>
+  <div id="scratch">
+      
+  </div>
+  <div id="compositeContainer">
+      
+  </div>
 
 <script type="x-shader" id="shared-vertex">
   attribute vec3 aVertexPosition;
@@ -65,10 +65,10 @@
   uniform vec2 uResolution;
 
   vec4 sampleColourFromTextureBasedOnDepth(float depth) {
-      // TODO: Sample around texture based on depth
-      vec4 sample = texture2D(uColourSampler, vec2(vTextureCoords.s, vTextureCoords.t));
-      sample.rgb *= (depth);
-      return sample;
+    // TODO: Sample around texture based on depth
+    vec4 sample = texture2D(uColourSampler, vec2(vTextureCoords.s, vTextureCoords.t));
+    sample.rgb *= (depth);
+    return sample;
   }
 
   void main(void) {
