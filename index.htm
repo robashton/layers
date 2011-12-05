@@ -1,0 +1,386 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <script src="jquery-1.4.1.js" type="text/javascript"></script>
+    <script src="glmatrix.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var game = new Game();
+            game.start();
+        });
+    </script>
+    <style>
+        body div
+        {
+            float: left;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <canvas id="game" width="320" height="320">
+
+        </canvas>
+    </div>
+    <div id="scratch">
+        
+    </div>
+    <div id="compositeContainer">
+        
+    </div>
+
+<div id="shader-vertex">
+attribute vec3 aVertexPosition;
+attribute vec2 aTextureCoords;
+
+uniform mat4 uProjection;
+uniform mat4 uView;
+uniform mat4 uWorld;
+varying vec2 vTextureCoords;
+
+void main(void){
+    gl_Position =  uProjection * uView * uWorld * vec4(aVertexPosition, 1.0);
+    vTextureCoords = aTextureCoords;
+}
+</div>
+<div id="depth-fragment">
+#ifdef GL_ES
+precision highp float;
+#endif
+
+varying vec2 vTextureCoords;
+
+uniform sampler2D uColourSampler;
+uniform sampler2D uDepthSampler;
+uniform vec2 uResolution;
+
+vec4 sampleColourFromTextureBasedOnDepth(float depth) {
+    // TODO: Sample around texture based on depth
+    vec4 sample = texture2D(uColourSampler, vec2(vTextureCoords.s, vTextureCoords.t));
+    sample.rgb *= (depth);
+    return sample;
+}
+
+void main(void) {
+  float realX = uResolution.x * vTextureCoords.x;
+  float realZ = uResolution.y * vTextureCoords.y;
+  
+  vec4 depthColour = texture2D(uDepthSampler, vec2(vTextureCoords.s, vTextureCoords.t));
+  vec4 colour = sampleColourFromTextureBasedOnDepth(depthColour.r);
+  gl_FragColor = colour;
+}
+</div>
+</body>
+
+    <script type="text/javascript">
+
+        var CompositeRenderer = function (target) {
+            var self = this;
+
+            var gl = null;
+            var vertexBuffer = null;
+            var textureBuffer = null;
+            var renderWidth = 0;
+            var renderHeight = 0;
+            var standardProgram = null;
+
+            var createBuffers = function () {
+                createRenderTarget();
+                createGeometry();
+                createShaders();
+                setupInitialState();
+            };
+
+            var setupInitialState = function () {
+                gl.clearColor(0.0, 0.0, 0.0, 1.0);
+            };
+
+            var createGeometry = function () {
+                vertexBuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(quadVertices), gl.STATIC_DRAW);
+
+                quadTextureBuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, quadTextureBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(quadTextureCoords), gl.STATIC_DRAW);
+            };
+
+            var createShaders = function () {
+                var vertexText = $('#shader-vertex').eq(0).text();
+                var fragmentText = $('#depth-fragment').eq(0).text();
+
+                var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+                var vertexShader = gl.createShader(gl.VERTEX_SHADER);
+
+                gl.shaderSource(fragmentShader, fragmentText);
+                gl.compileShader(fragmentShader);
+
+                gl.shaderSource(vertexShader, vertexText);
+                gl.compileShader(vertexShader);
+
+                standardProgram = gl.createProgram();
+                gl.attachShader(standardProgram, vertexShader);
+                gl.attachShader(standardProgram, fragmentShader);
+                gl.linkProgram(standardProgram);
+                if (!gl.getProgramParameter(standardProgram, gl.LINK_STATUS)) {
+                    throw "Couldn't create program";
+                }
+            };
+
+            self.renderScene = function (colourCanvas, depthCanvas) {
+                gl.viewport(0, 0, renderWidth, renderHeight);
+                gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+                gl.useProgram(standardProgram);
+                var projectionMatrix = mat4.ortho(0, renderWidth, renderHeight, 0, -1, 1);
+                var viewMatrix = mat4.lookAt([0, 0, 0], [0, 0, -1], [0, 1, 0]);
+
+                var worldMatrix = mat4.create();
+                mat4.identity(worldMatrix);
+                mat4.scale(worldMatrix, [renderWidth, renderHeight, 1.0]);
+
+                // Upload the quad
+                gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+                gl.vertexAttribPointer(gl.getAttribLocation(standardProgram, 'aVertexPosition'), 3, gl.FLOAT, false, 0, 0);
+                gl.enableVertexAttribArray(gl.getAttribLocation(standardProgram, 'aVertexPosition'));
+
+                // And the texture coords
+                gl.bindBuffer(gl.ARRAY_BUFFER, quadTextureBuffer);
+                gl.vertexAttribPointer(gl.getAttribLocation(standardProgram, 'aTextureCoords'), 2, gl.FLOAT, false, 0, 0);
+                gl.enableVertexAttribArray(gl.getAttribLocation(standardProgram, 'aTextureCoords'));
+
+                // Set the orthographic projection setup
+                gl.uniformMatrix4fv(gl.getUniformLocation(standardProgram, "uProjection"), false, projectionMatrix);
+                gl.uniformMatrix4fv(gl.getUniformLocation(standardProgram, "uView"), false, viewMatrix);
+                gl.uniformMatrix4fv(gl.getUniformLocation(standardProgram, "uWorld"), false, worldMatrix);
+
+                gl.uniform2f(gl.getUniformLocation(standardProgram, "uResolution"), false, [renderWidth, renderHeight]);
+
+                // create textures from inputs
+                var colourTexture = createTextureFromCanvas(colourCanvas);
+                var depthTexture = createTextureFromCanvas(depthCanvas);
+
+                gl.activeTexture(gl.TEXTURE0);
+                gl.bindTexture(gl.TEXTURE_2D, colourTexture);
+                gl.uniform1i(gl.getUniformLocation(standardProgram, 'uColourSampler'), 0);
+
+                gl.activeTexture(gl.TEXTURE1);
+                gl.bindTexture(gl.TEXTURE_2D, depthTexture);
+                gl.uniform1i(gl.getUniformLocation(standardProgram, 'uDepthSampler'), 1);
+
+                gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+                // TODO: This is really not efficient
+                gl.deleteTexture(colourTexture);
+                gl.deleteTexture(depthTexture);
+            };
+
+            var createTextureFromCanvas = function (canvasElement) {
+                var texture = gl.createTexture();
+                gl.bindTexture(gl.TEXTURE_2D, texture);
+                gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, canvasElement);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+                return texture;
+            };
+
+            var createRenderTarget = function () {
+                var scratchPad = $('#compositeContainer');
+                var compositePad = $('<canvas/>')
+                                .attr('width', target.width)
+                                .attr('height', target.height)
+                                .attr('id', 'composite');
+                scratchPad.append(compositePad);
+                gl = $('#composite').get(0).getContext("experimental-webgl", { antialias: false });
+
+                renderWidth = target.width;
+                renderHeight = target.height;
+            };
+
+
+            var quadVertices = [
+                 0.0, 0.0, 0.0,
+                 1.0, 0.0, 0.0,
+                 0.0, 1.0, 0.0,
+                 1.0, 1.0, 0.0
+            ];
+
+            var quadTextureCoords = [
+                 0.0, 1.0,
+                 1.0, 1.0,
+                 0.0, 0.0,
+                 1.0, 0.0,
+            ];
+
+            createBuffers();
+        };
+
+        var RenderTarget = function (target, nearestPoint) {
+            var self = this;
+            var colourBuffer = null;
+            var depthBuffer = null;
+            var depthTarget = null;
+
+            self.colourTarget = function () { return target; }
+            self.depthTarget = function () { return depthTarget; }
+
+            self.fillRect = function (x, y, z, width, height, colour) {
+                fillColourBuffer(x, y, width, height, colour);
+                fillDepthBuffer(x, y, z, width, height, colour);
+            };
+
+            var fillColourBuffer = function (x, y, width, height, colour) {
+                colourBuffer.setFillColor(colour);
+                colourBuffer.fillRect(x, y, width, height);
+            };
+
+            var fillDepthBuffer = function (x, y, z, width, height, colour) {
+                var depthComponent = parseInt((z / nearestPoint) * 255);
+                var depthColour = 'rgba(' + depthComponent + ', 0, 0, 255)';
+                depthBuffer.setFillColor(depthColour);
+                depthBuffer.fillRect(x, y, width, height);
+            };
+
+            var createBuffers = function () {
+                var scratchPad = $('#scratch');
+                var depthPad = $('<canvas/>')
+                                .attr('width', target.width)
+                                .attr('height', target.height)
+                                .attr('id', 'depth');
+                scratchPad.append(depthPad);
+
+                colourBuffer = target.getContext('2d');
+                depthTarget =  $('#depth').get(0);
+                depthBuffer = depthTarget.getContext('2d');
+            };
+
+            createBuffers();
+        };
+
+        var Layer = function (depth, sceneWidth) {
+            var self = this;
+            var entities = [];
+
+            self.addEntity = function (x, y, width, height, colour) {
+                entities.push({
+                    width: width * (depth / 5.0),
+                    height: height * (depth / 5.0),
+                    colour: colour,
+                    x: x,
+                    y: y
+                });
+            };
+
+            self.doLogic = function () {
+                for (var i = 0; i < entities.length; i++)
+                    doLogicForEntity(i);
+            };
+
+            var doLogicForEntity = function (i) {
+                entities[i].x += 0.5 * depth;
+                if (entities[i].x > sceneWidth) {
+                    entities[i].x = 0 - entities[i].width;
+                }
+            };
+
+            self.render = function (context) {
+                for (var i = 0; i < entities.length; i++)
+                    renderEntity(context, i);
+            };
+
+            var renderEntity = function (context, i) {
+                var entity = entities[i];
+                context.fillRect(entity.x, entity.y, depth, entity.width, entity.height, entity.colour);
+            };
+        };
+
+        var World = function (sceneWidth, sceneHeight) {
+            var self = this;
+            var layers = [];
+
+            layers.push(new Layer(1.0, sceneWidth));
+            layers.push(new Layer(3.0, sceneWidth));
+            layers.push(new Layer(5.0, sceneWidth));
+            layers.push(new Layer(8.0, sceneWidth));
+
+            self.doLogic = function () {
+                for (var i = 0; i < layers.length; i++)
+                    layers[i].doLogic();
+            };
+
+            self.render = function (context) {
+                for (var i = 0; i < layers.length; i++)
+                    layers[i].render(context);
+            };
+
+            self.addEntity = function (layer, width, height, x, y, colour) {
+                layers[layer].addEntity(width, height, x, y, colour);
+            };
+        };
+
+
+        var Game = function () {
+            var self = this;
+            var element = document.getElementById('game');
+            var world = new World(element.width, element.height);
+            var renderTarget = new RenderTarget(element, 8.0);
+            var compositeTarget = new CompositeRenderer(element);
+
+            var doLogic = function () {
+                world.doLogic();
+            };
+
+            var renderScene = function () {
+                clearRenderingTarget();
+                world.render(renderTarget);
+                compositeTarget.renderScene(renderTarget.colourTarget(), renderTarget.depthTarget());
+            };
+
+            var clearRenderingTarget = function () {
+                renderTarget.fillRect(0, 0, 0, element.width, element.height, 'black');
+            };
+
+            self.start = function () {
+                setInterval(doLogic, 1000 / 30);
+                setInterval(renderScene, 1000 / 30);
+            };
+
+            var populateWorldWithJunk = function () {
+                for (var x = 0; x < 1000; x++) {
+                    world.addEntity(0, randomPointInWidth(), randomPointInHeight(), randomWidth(), randomHeight(), '#FF0000');
+                };
+                for (var x = 0; x < 200; x++) {
+                    world.addEntity(1, randomPointInWidth(), randomPointInHeight(), randomWidth(), randomHeight(), '#0000FF');
+                };
+                for (var x = 0; x < 50; x++) {
+                    world.addEntity(2, randomPointInWidth(), randomPointInHeight(), randomWidth(), randomHeight(), '#FF00FF');
+                };
+                for (var x = 0; x < 25; x++) {
+                    world.addEntity(3, randomPointInWidth(), randomPointInHeight(), randomWidth(), randomHeight(), '#FF1111');
+                };
+            };
+
+            var randomPointInWidth = function () {
+                return Math.random() * element.width;
+            };
+
+            var randomPointInHeight = function () {
+                return Math.random() * element.height;
+            };
+
+            var randomWidth = function () {
+                return Math.random() * 30;
+            };
+
+            var randomHeight = function () {
+                return Math.random() * 30;
+            };
+
+            populateWorldWithJunk();
+        };
+    </script>
+</html>
