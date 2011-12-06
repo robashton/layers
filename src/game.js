@@ -2,8 +2,8 @@ var Game = function () {
   var self = this;
   var element = document.getElementById('game');
   var world = new World(element.width, element.height);
-  var renderTarget = new RenderTarget(element, 8.0);
-  var compositeTarget = new CompositeRenderer(element);
+  var canvasRenderStage = new CanvasRenderStage(element, 8.0);
+  var webglRenderStage = new WebglRenderStage(element);
 
   var doLogic = function () {
     world.doLogic();
@@ -11,12 +11,12 @@ var Game = function () {
 
   var renderScene = function () {
     clearRenderingTarget();
-    world.render(renderTarget);
-    compositeTarget.renderScene(renderTarget.colourTarget(), renderTarget.depthTarget());
+    world.render(canvasRenderStage);
+    webglRenderStage.renderScene(canvasRenderStage.colourTarget(), canvasRenderStage.depthTarget());
   };
 
   var clearRenderingTarget = function () {
-    renderTarget.fillRect(0, 0, 0, element.width, element.height, new Material(0,0,0));
+    canvasRenderStage.fillRect(0, 0, 0, element.width, element.height, new Material(0,0,0));
   };
 
   self.start = function () {

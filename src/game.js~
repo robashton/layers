@@ -2,8 +2,8 @@ var Game = function () {
   var self = this;
   var element = document.getElementById('game');
   var world = new World(element.width, element.height);
-  var renderTarget = new RenderTarget(element, 8.0);
-  var compositeTarget = new CompositeRenderer(element);
+  var canvasRenderStage = new CanvasRenderStage(element, 8.0);
+  var webglRenderStage = new WebglRenderStage(element);
 
   var doLogic = function () {
     world.doLogic();
@@ -11,8 +11,8 @@ var Game = function () {
 
   var renderScene = function () {
     clearRenderingTarget();
-    world.render(renderTarget);
-    compositeTarget.renderScene(renderTarget.colourTarget(), renderTarget.depthTarget());
+    world.render(canvasRenderStage);
+    webglRenderStage.renderScene(canvasRenderStage.colourTarget(), canvasRenderStage.depthTarget());
   };
 
   var clearRenderingTarget = function () {
@@ -35,7 +35,7 @@ var Game = function () {
       world.addEntity(2, randomPointInWidth(), randomPointInHeight(), randomWidth(), randomHeight(), new Material(255,0,255));
     };
     for (var x = 0; x < 25; x++) {
-      world.addEntity(3, randomPointInWidth(), randomPointInHeight(), randomWidth(), randomHeight(), new Material(255,55,55));
+      world.addEntity(3, randomPointInWidth(), randomPointInHeight(), randomWidth(), randomHeight(), new Material(255,30,30));
     };
   };
 

@@ -1,4 +1,4 @@
-var CompositeRenderer = function (target) {
+var WebglRenderStage = function (target) {
   var self = this;
 
   var gl = null;
@@ -9,6 +9,8 @@ var CompositeRenderer = function (target) {
   var renderWidth = 0;
   var renderHeight = 0;
   var camera = new Camera();
+
+  var mainRenderTarget = null;
 
   self.renderScene = function (colourCanvas, depthCanvas) {
     gl.viewport(0, 0, renderWidth, renderHeight);
@@ -31,10 +33,11 @@ var CompositeRenderer = function (target) {
   };
 
   var createBuffers = function () {
-    createRenderTarget();
+    createGlContext();
     createGeometry();
     createShaders();
     setupInitialState();
+    createRenderTargets();
   };
 
   var setupInitialState = function () {
@@ -52,26 +55,11 @@ var CompositeRenderer = function (target) {
   };
 
   var createShaders = function () {
-    var vertexText = $('#shared-vertex').eq(0).text();
-    var fragmentText = $('#depth-fragment').eq(0).text();
-
-    var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-    var vertexShader = gl.createShader(gl.VERTEX_SHADER);
-
-    gl.shaderSource(fragmentShader, fragmentText);
-    gl.compileShader(fragmentShader);
-
-    gl.shaderSource(vertexShader, vertexText);
-    gl.compileShader(vertexShader);
-
-    var standardProgram = gl.createProgram();
-    gl.attachShader(standardProgram, vertexShader);
-    gl.attachShader(standardProgram, fragmentShader);
-    gl.linkProgram(standardProgram);
-    if (!gl.getProgramParameter(standardProgram, gl.LINK_STATUS)) {
-        throw "Couldn't create program";
-    }
-    basicEffect = new Effect(gl, standardProgram);
+      
+    basicEffect = new EffectBuilder(gl)
+                .addVertexShaderFromElementWithId('shared-vertex')
+                .addFragmentShaderFromElementWithId('depth-fragment')
+                .build();
   };
 
   var createTextureFromCanvas = function (canvasElement) {
@@ -85,7 +73,11 @@ var CompositeRenderer = function (target) {
     return texture;
   };
 
-  var createRenderTarget = function () {
+  var createRenderTargets = function() {
+    mainRenderTarget = RenderTarget.CreateFromDefaults(gl);
+  };
+
+  var createGlContext = function () {
     var scratchPad = $('#compositeContainer');
     var compositePad = $('<canvas/>')
                     .attr('width', target.width)
