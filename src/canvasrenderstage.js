@@ -1,11 +1,8 @@
-var CanvasRenderStage = function (target, nearestPoint) {
+var CanvasRenderStage = function (colourElement, depthElement, nearestPoint) {
   var self = this;
+
   var colourBuffer = null;
   var depthBuffer = null;
-  var depthTarget = null;
-
-  self.colourTarget = function () { return target; }
-  self.depthTarget = function () { return depthTarget; }
 
   self.fillRect = function (x, y, z, width, height, material) {
     fillColourBuffer(x, y, z, width, height, material);
@@ -27,18 +24,8 @@ var CanvasRenderStage = function (target, nearestPoint) {
   };
 
   var createBuffers = function () {
-    var scratchPad = $('#scratch');
-
-    var depthPad = $('<canvas/>')
-      .attr('width', target.width)
-      .attr('height', target.height)
-      .attr('id', 'depth');
-
-    scratchPad.append(depthPad);
-
-    colourBuffer = target.getContext('2d');
-    depthTarget =  $('#depth').get(0);
-    depthBuffer = depthTarget.getContext('2d');
+    colourBuffer = colourElement.getContext('2d');
+    depthBuffer = depthElement.getContext('2d');
   };
 
   createBuffers();

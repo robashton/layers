@@ -1,9 +1,13 @@
 var Game = function () {
   var self = this;
-  var element = document.getElementById('game');
-  var world = new World(element.width, element.height);
-  var canvasRenderStage = new CanvasRenderStage(element, 8.0);
-  var webglRenderStage = new WebglRenderStage(element);
+
+  var colourElement = document.getElementById('colour');
+  var depthElement = document.getElementById('depth');
+  var glElement = document.getElementById('webgl');
+
+  var world = new World(colourElement.width, colourElement.height);
+  var canvasRenderStage = new CanvasRenderStage(colourElement, depthElement, 8.0);
+  var webglRenderStage = new WebglRenderStage(glElement);
 
   var doLogic = function () {
     world.doLogic();
@@ -12,11 +16,11 @@ var Game = function () {
   var renderScene = function () {
     clearRenderingTarget();
     world.render(canvasRenderStage);
-    webglRenderStage.renderScene(canvasRenderStage.colourTarget(), canvasRenderStage.depthTarget());
+    webglRenderStage.renderScene(colourElement, depthElement);
   };
 
   var clearRenderingTarget = function () {
-    canvasRenderStage.fillRect(0, 0, 0, element.width, element.height, new Material(0,0,0));
+    canvasRenderStage.fillRect(0, 0, 0, colourElement.width, colourElement.height, new Material(0,0,0));
   };
 
   self.start = function () {
@@ -40,11 +44,11 @@ var Game = function () {
   };
 
   var randomPointInWidth = function () {
-    return Math.random() * element.width;
+    return Math.random() * colourElement.width;
   };
 
   var randomPointInHeight = function () {
-    return Math.random() * element.height;
+    return Math.random() * colourElement.height;
   };
 
   var randomWidth = function () {

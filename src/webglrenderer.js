@@ -26,14 +26,14 @@ var WebglRenderer = function (target) {
 
     currentColourInput = canvasColourTexture;
     currentDepthInput = canvasDepthTexture;
-    var currentRenderTarget = memoryTargetOne;
+    var currentRenderTarget = effects.length === 1 ? screenTarget : memoryTargetOne;
 
     for(var i = 0; i < effects.length; i++) {
       currentRenderTarget.upload();
       renderPass(effects[i]);
       currentRenderTarget.clear();
 
-      if(i < effects.length-1) {
+      if(i < effects.length - 1) {
         currentColourInput = currentRenderTarget.getTexture();
         currentRenderTarget = i === (effects.length-2) ? screenTarget : (currentRenderTarget === memoryTargetOne ? memoryTargetTwo : memoryTargetOne);       
       }
@@ -87,13 +87,6 @@ var WebglRenderer = function (target) {
     builderFunction(builder);
     var effect = builder.build();
     effects.push(effect);
-
-    if(effects.length === 1) {
-      
-    } else {
-
-    }
-
   };
 
   var createTextureFromCanvas = function (canvasElement) {
@@ -108,16 +101,7 @@ var WebglRenderer = function (target) {
   };
 
   var createGlContext = function () {
-    var scratchPad = $('#compositeContainer');
-    var compositePad = $('<canvas/>')
-                    .attr('width', target.width)
-                    .attr('height', target.height)
-                    .attr('id', 'composite');
-
-    scratchPad.append(compositePad);
-    gl = $('#composite')
-          .get(0)
-          .getContext("experimental-webgl", 
+    gl = target.getContext("experimental-webgl", 
           { antialias: false });
 
     renderWidth = target.width;

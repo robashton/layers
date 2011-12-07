@@ -24,16 +24,19 @@
 </head>
 <body>
   <div id="container">
-    <canvas id="game" width="320" height="320">
+    <canvas id="colour" width="320" height="320">
+
+    </canvas>
+    +
+    <canvas id="depth" width="320" height="320">
+
+    </canvas>
+    =
+    <canvas id="webgl" width="320" height="320">
 
     </canvas>
   </div>
-  <div id="scratch" style="display: none;">
-      
-  </div>
-  <div id="compositeContainer">
-      
-  </div>
+
 
 <script type="x-shader" id="shared-vertex">
   attribute vec3 aVertexPosition;
