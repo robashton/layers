@@ -3,15 +3,13 @@ var WebglRenderStage = function(target) {
 
   var renderer = new WebglRenderer(target);
 
-  var standardEffect = renderer.newEffect()
-        .addVertexShaderFromElementWithId('shared-vertex')
-        .addFragmentShaderFromElementWithId('depth-fragment')
-        .build();
+  renderer.addPass(function(builder) {
+      builder
+      .addVertexShaderFromElementWithId('shared-vertex')
+      .addFragmentShaderFromElementWithId('depth-fragment');
+  });
 
   self.renderScene = function(colour, depth) {
-      renderer.begin(colour, depth);    
-      renderer.renderPass(standardEffect);
-      renderer.end();
+      renderer.render(colour, depth);
   };
-
 };

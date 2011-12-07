@@ -9,20 +9,17 @@ var WebglRenderer = function (target) {
   var renderHeight = 0;
   var camera = new Camera();
 
-  var currentColourInput = null;
-  var currentDepthInput = null;
+  var effects = [];
 
-  self.begin = function(colourCanvas, depthCanvas) {
-    currentColourInput = createTextureFromCanvas(colourCanvas);
-    currentDepthInput = createTextureFromCanvas(depthCanvas);
-  };
+  self.render = function (colourCanvas, depthCanvas) { 
+    if(effects.length === 0)
+      throw "No effects were specified before calling render!";
 
-  self.end = function() {
-    gl.deleteTexture(currentColourInput);
-    gl.deleteTexture(currentDepthInput);
-  };
+    var currentColourInput = createTextureFromCanvas(colourCanvas);
+    var currentDepthInput = createTextureFromCanvas(depthCanvas);
 
-  self.renderPass = function (effect) { 
+    var effect = effects[0];
+
     gl.viewport(0, 0, renderWidth, renderHeight);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     camera.update(renderWidth, renderHeight);
@@ -31,14 +28,15 @@ var WebglRenderer = function (target) {
     effect.buffers(vertexBuffer, textureBuffer);
     effect.camera(camera);
     effect.inputTextures(currentColourInput, currentDepthInput);
-    effect.render();   
+    effect.render();
 
+    gl.deleteTexture(currentColourInput);
+    gl.deleteTexture(currentDepthInput);
   };
 
   var createBuffers = function () {
     createGlContext();
     createGeometry();
-    createShaders();
     setupInitialState();
   };
 
@@ -56,15 +54,11 @@ var WebglRenderer = function (target) {
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(quadTextureCoords), gl.STATIC_DRAW);
   };
 
-  self.newEffect = function() {
-    return new EffectBuilder(gl);
-  };
-
-  var createShaders = function () {
-    basicEffect = new EffectBuilder(gl)
-        .addVertexShaderFromElementWithId('shared-vertex')
-        .addFragmentShaderFromElementWithId('depth-fragment')
-        .build();
+  self.addPass = function(builderFunction) {
+    var builder = new EffectBuilder(gl);
+    builderFunction(builder);
+    var effect = builder.build();
+    effects.push(effect);
   };
 
   var createTextureFromCanvas = function (canvasElement) {

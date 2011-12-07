@@ -12,9 +12,10 @@ var WebglRenderer = function (target) {
   var currentColourInput = null;
   var currentDepthInput = null;
 
-  self.begin = function(colourCanvas, depthCanvas) {
-    currentColourInput = createTextureFromCanvas(colourCanvas);
-    currentDepthInput = createTextureFromCanvas(depthCanvas);
+  var effects = [];
+
+  self.begin = function() {
+
   };
 
   self.end = function() {
@@ -22,7 +23,15 @@ var WebglRenderer = function (target) {
     gl.deleteTexture(currentDepthInput);
   };
 
-  self.renderPass = function (effect) { 
+  self.render = function (colourCanvas, depthCanvas) { 
+    if(effects.length === 0)
+      throw "No effects were specified before calling render!";
+
+    var currentColourInput = createTextureFromCanvas(colourCanvas);
+    var currentDepthInput = createTextureFromCanvas(depthCanvas);
+
+    var effect = effects[0];
+
     gl.viewport(0, 0, renderWidth, renderHeight);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     camera.update(renderWidth, renderHeight);
@@ -31,16 +40,14 @@ var WebglRenderer = function (target) {
     effect.buffers(vertexBuffer, textureBuffer);
     effect.camera(camera);
     effect.inputTextures(currentColourInput, currentDepthInput);
-    effect.render();   
+    effect.render();
 
   };
 
   var createBuffers = function () {
     createGlContext();
     createGeometry();
-    createShaders();
     setupInitialState();
-    createRenderTargets();
   };
 
   var setupInitialState = function () {
@@ -57,15 +64,11 @@ var WebglRenderer = function (target) {
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(quadTextureCoords), gl.STATIC_DRAW);
   };
 
-  self.newEffect = function() {
-    return new EffectBuilder(gl);
-  };
-
-  var createShaders = function () {
-    basicEffect = new EffectBuilder(gl)
-        .addVertexShaderFromElementWithId('shared-vertex')
-        .addFragmentShaderFromElementWithId('depth-fragment')
-        .build();
+  self.addPass = function(builderFunction) {
+    var builder = new EffectBuilder(gl);
+    builderFunction(builder);
+    var effect = builder.build();
+    effects.push(effect);
   };
 
   var createTextureFromCanvas = function (canvasElement) {
@@ -77,10 +80,6 @@ var WebglRenderer = function (target) {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     return texture;
-  };
-
-  var createRenderTargets = function() {
-    mainRenderTarget = RenderTarget.CreateFromDefaults(gl);
   };
 
   var createGlContext = function () {
