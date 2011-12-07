@@ -1,4 +1,4 @@
-var WebglRenderer = function (target) {
+var WebglRenderer = function (target, shaderFactory) {
   var self = this;
 
   var gl = null;

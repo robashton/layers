@@ -3,7 +3,7 @@ var EffectBuilder = function(gl) {
   var shaders = [];
 
   self.addVertexShaderFromElementWithId = function(id) {
-    var vertexText = $('#' + id).eq(0).text();
+    var vertexText = document.getElementById(id).innerText;
     var vertexShader = gl.createShader(gl.VERTEX_SHADER);
     gl.shaderSource(vertexShader, vertexText);
     gl.compileShader(vertexShader);
@@ -12,7 +12,7 @@ var EffectBuilder = function(gl) {
   };
 
   self.addFragmentShaderFromElementWithId = function(id) {
-    var fragmentText = $('#' + id).eq(0).text();
+    var fragmentText = document.getElementById(id).innerText;
     var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
     gl.shaderSource(fragmentShader, fragmentText);
     gl.compileShader(fragmentShader);
