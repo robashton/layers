@@ -6,6 +6,7 @@
   <script src="glmatrix.js" type="text/javascript"></script>
   <script src="src/camera.js" type="text/javascript"></script>
   <script src="src/rendertarget.js" type="text/javascript"></script>
+  <script src="src/effectbuilder.js" type="text/javascript"></script>
   <script src="src/effect.js" type="text/javascript"></script>
   <script src="src/material.js" type="text/javascript"></script>
   <script src="src/canvasrenderstage.js" type="text/javascript"></script>

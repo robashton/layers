@@ -8,6 +8,8 @@ var WebglRenderStage = function(target) {
         .addFragmentShaderFromElementWithId('depth-fragment')
         .build();
 
+
+
   self.renderScene = function(colour, depth) {
       renderer.begin(colour, depth);    
       renderer.renderPass(standardEffect);
