@@ -11,15 +11,39 @@ var WebglRenderer = function (target) {
 
   var effects = [];
 
+  var currentColourInput = null;
+  var currentDepthInput = null;
+  var memoryTargetOne = null;
+  var memoryTargetTwo = null;
+  var screenTarget = null;
+
   self.render = function (colourCanvas, depthCanvas) { 
     if(effects.length === 0)
       throw "No effects were specified before calling render!";
 
-    var currentColourInput = createTextureFromCanvas(colourCanvas);
-    var currentDepthInput = createTextureFromCanvas(depthCanvas);
+    var canvasColourTexture =  createTextureFromCanvas(colourCanvas);
+    var canvasDepthTexture =  createTextureFromCanvas(colourCanvas);
 
-    var effect = effects[0];
+    currentColourInput = canvasColourTexture;
+    currentDepthInput = canvasDepthTexture;
+    var currentRenderTarget = memoryTargetOne;
 
+    for(var i = 0; i < effects.length; i++) {
+      currentRenderTarget.upload();
+      renderPass(effects[i]);
+      currentRenderTarget.clear();
+
+      if(i < effects.length-1) {
+        currentColourInput = currentRenderTarget.getTexture();
+        currentRenderTarget = i === (effects.length-2) ? screenTarget : (currentRenderTarget === memoryTargetOne ? memoryTargetTwo : memoryTargetOne);       
+      }
+    }   
+    
+    gl.deleteTexture(canvasColourTexture);
+    gl.deleteTexture(canvasDepthTexture);
+  };
+
+  var renderPass = function(effect) {
     gl.viewport(0, 0, renderWidth, renderHeight);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     camera.update(renderWidth, renderHeight);
@@ -29,15 +53,19 @@ var WebglRenderer = function (target) {
     effect.camera(camera);
     effect.inputTextures(currentColourInput, currentDepthInput);
     effect.render();
-
-    gl.deleteTexture(currentColourInput);
-    gl.deleteTexture(currentDepthInput);
   };
 
   var createBuffers = function () {
     createGlContext();
     createGeometry();
+    createRenderTargets();
     setupInitialState();
+  };
+
+  var createRenderTargets = function() {
+    memoryTargetOne = new RenderTarget(gl, renderWidth, renderHeight);
+    memoryTargetTwo = new RenderTarget(gl, renderWidth, renderHeight);
+    screenTarget = new ScreenRenderTarget(gl);
   };
 
   var setupInitialState = function () {
@@ -59,6 +87,13 @@ var WebglRenderer = function (target) {
     builderFunction(builder);
     var effect = builder.build();
     effects.push(effect);
+
+    if(effects.length === 1) {
+      
+    } else {
+
+    }
+
   };
 
   var createTextureFromCanvas = function (canvasElement) {

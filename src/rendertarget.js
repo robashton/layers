@@ -1,3 +1,14 @@
+var ScreenRenderTarget = function(gl) {
+  var self = this;
+
+  self.upload = function() {
+     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  };
+  self.clear = function() {};
+  self.getTexture = function() { throw "Not supported"; }
+
+};
+
 var RenderTarget = function(gl, width, height) {
   var self = this;
   var width = width;
@@ -10,8 +21,7 @@ var RenderTarget = function(gl, width, height) {
     gl.bindFramebuffer(gl.FRAMEBUFFER, rttFramebuffer);
   };
 
-  self.clear = function(context) {
-   var gl = context.gl;
+  self.clear = function() {
    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   };
 

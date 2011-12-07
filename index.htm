@@ -58,7 +58,7 @@
   }
 </script>
 
-<script type="x-shader" id="glow-fragment">
+<script type="x-shader" id="green-fragment">
   #ifdef GL_ES
   precision highp float;
   #endif
@@ -69,12 +69,47 @@
   uniform sampler2D uDepthSampler;
   uniform vec2 uResolution;
 
-  void main(void) {
-    float realX = uResolution.x * vTextureCoords.x;
-    float realZ = uResolution.y * vTextureCoords.y;
-    
-    vec4 depthColour = texture2D(uDepthSampler, vec2(vTextureCoords.s, vTextureCoords.t));
-    vec4 colour = sampleColourFromTextureBasedOnDepth(depthColour.r);
+  void main(void) {  
+    vec4 colour =  texture2D(uColourSampler, vTextureCoords);
+    colour.g += 0.5;
+    gl_FragColor = colour;
+  }
+  
+</script>
+
+<script type="x-shader" id="blue-fragment">
+  #ifdef GL_ES
+  precision highp float;
+  #endif
+
+  varying vec2 vTextureCoords;
+
+  uniform sampler2D uColourSampler;
+  uniform sampler2D uDepthSampler;
+  uniform vec2 uResolution;
+
+  void main(void) {  
+    vec4 colour =  texture2D(uColourSampler, vTextureCoords);
+    colour.b += 0.1;
+    gl_FragColor = colour;
+  }
+  
+</script>
+
+<script type="x-shader" id="red-fragment">
+  #ifdef GL_ES
+  precision highp float;
+  #endif
+
+  varying vec2 vTextureCoords;
+
+  uniform sampler2D uColourSampler;
+  uniform sampler2D uDepthSampler;
+  uniform vec2 uResolution;
+
+  void main(void) {  
+    vec4 colour =  texture2D(uColourSampler, vTextureCoords);
+    colour.r += 0.1;
     gl_FragColor = colour;
   }
   
