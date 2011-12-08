@@ -10,10 +10,14 @@ var CanvasRenderStage = function (colourElement, depthElement, nearestPoint) {
   };
 
   var fillColourBuffer = function (x, y, z, width, height, material) {
-    var scale = 0.5 + (z / (nearestPoint * 2));
-    material = material.scale(scale);
     colourBuffer.setFillColor(material.rgba());
-    colourBuffer.fillRect(x, y, width, height);
+
+    if(material.image()) {
+      colourBuffer.drawImage(material.image(), x, y, width, height);
+    } else {
+      colourBuffer.fillRect(x, y, width, height);
+    }
+
   };
 
   var fillDepthBuffer = function (x, y, z, width, height) {

@@ -23,7 +23,6 @@ var inputFiles = [
 var outputText = '';
 
 var addFile = function(index, callback) {
-  console.log(inputFiles[index]);
   fs.readFile(inputFiles[index], function(err, data) {
     
     outputText += data;
@@ -40,7 +39,8 @@ var buildAllFiles = function(callback) {
   addFile(0, callback);
 };
 
-
-buildAllFiles(function() {
-  fs.writeFile('lib/layers.js', outputText);
-});
+exports.go = function() {
+  buildAllFiles(function() {
+    fs.writeFile('lib/layers.js', outputText);
+  });
+};
