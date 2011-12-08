@@ -1,26 +1,49 @@
+var Square = function(x,y, width, height, material, layer) {
+  var self = this;
+
+  var entity = new Entity(x, y, width, height, material);
+  layer.addEntity(entity);
+
+  self.renderable = function() {
+    return entity;
+  };
+
+  self.doLogic = function() {
+    x += 2;
+    if(x > layer.getWidth())
+      x = 0 - width;
+    entity.position(x, y);  
+  };
+};
+
 var Game = function () {
   var self = this;
 
-  var colourElement = document.getElementById('colour');
-  var depthElement = document.getElementById('depth');
-  var glElement = document.getElementById('webgl');
+  var engine = new EngineBuilder('colour', 'depth', 'webgl')
+                    .nearestPoint(8.0)
+                    .sceneWidth(320)
+                    .sceneHeight(320)
+                    .build();
 
-  var world = new World(colourElement.width, colourElement.height);
-  var canvasRenderStage = new CanvasRenderStage(colourElement, depthElement, 8.0);
-  var webglRenderStage = new WebglRenderStage(glElement);
+  var world = engine.world();
 
-  var doLogic = function () {
-    world.doLogic();
+    
+                  
+  var backdrop = world.addLayer(1.0);
+  var middle1 = world.addLayer(3.0);
+  var middle2 = world.addLayer(5.0);
+  var foreground = world.addLayer(8.0);
+
+  var items = [];
+
+  var doLogic = function() {
+    for(var i in items) {
+      items[i].doLogic();
+    }
   };
 
   var renderScene = function () {
-    clearRenderingTarget();
-    world.render(canvasRenderStage);
-    webglRenderStage.renderScene(colourElement, depthElement);
-  };
-
-  var clearRenderingTarget = function () {
-    canvasRenderStage.fillRect(0, 0, 0, colourElement.width, colourElement.height, new Material(0,0,0));
+    engine.render();
   };
 
   self.start = function () {
@@ -30,25 +53,29 @@ var Game = function () {
 
   var populateWorldWithJunk = function () {
     for (var x = 0; x < 1000; x++) {
-      world.addEntity(0, randomPointInWidth(), randomPointInHeight(), randomWidth(), randomHeight(), new Material(255,0,0));
-    };
+      var item = new Square(randomPointInWidth(backdrop), randomPointInHeight(backdrop), randomWidth(), randomHeight(), new Material(255,0,0), backdrop);
+      items.push(item); 
+    }
     for (var x = 0; x < 200; x++) {
-      world.addEntity(1, randomPointInWidth(), randomPointInHeight(), randomWidth(), randomHeight(), new Material(0,0,255));
-    };
+      var item = new Square(randomPointInWidth(middle1), randomPointInHeight(middle1), randomWidth(), randomHeight(), new Material(0,0,255), middle1);
+      items.push(item); 
+    }
     for (var x = 0; x < 50; x++) {
-      world.addEntity(2, randomPointInWidth(), randomPointInHeight(), randomWidth(), randomHeight(), new Material(255,0,255));
-    };
+      var item = new Square(randomPointInWidth(middle2), randomPointInHeight(middle2), randomWidth(), randomHeight(), new Material(255,0,255), middle2);
+      items.push(item); 
+    }
     for (var x = 0; x < 25; x++) {
-      world.addEntity(3, randomPointInWidth(), randomPointInHeight(), randomWidth(), randomHeight(), new Material(255,30,30));
-    };
+      var item = new Square(randomPointInWidth(foreground), randomPointInHeight(foreground), randomWidth(), randomHeight(), new Material(255,30,30), foreground);
+      items.push(item); 
+    }; 
   };
 
-  var randomPointInWidth = function () {
-    return Math.random() * colourElement.width;
+  var randomPointInWidth = function (layer) {
+    return Math.random() * layer.getWidth();
   };
 
-  var randomPointInHeight = function () {
-    return Math.random() * colourElement.height;
+  var randomPointInHeight = function (layer) {
+    return Math.random() *  layer.getWidth();
   };
 
   var randomWidth = function () {

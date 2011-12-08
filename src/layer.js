@@ -1,27 +1,10 @@
-var Layer = function (depth, sceneWidth) {
+var Layer = function (depth, scaleFactor, sceneWidth, sceneHeight) {
   var self = this;
   var entities = [];
 
-  self.addEntity = function (x, y, width, height, material) {
-    entities.push({
-      width: width * (depth / 5.0),
-      height: height * (depth / 5.0),
-      material: material,
-      x: x,
-      y: y
-    });
-  };
-
-  self.doLogic = function () {
-    for (var i = 0; i < entities.length; i++)
-      doLogicForEntity(i);
-  };
-
-  var doLogicForEntity = function (i) {
-    entities[i].x += 0.5 * depth;
-    if (entities[i].x > sceneWidth) {
-      entities[i].x = 0 - entities[i].width;
-    }
+  self.addEntity = function (entity) {
+    entities.push(entity);
+    entity.setLayer(self);
   };
 
   self.render = function (context) {
@@ -29,9 +12,26 @@ var Layer = function (depth, sceneWidth) {
       renderEntity(context, i);
   };
 
+  self.getDepth = function() {
+    return depth;
+  };
+
+  self.getWidth = function() {
+    return sceneWidth / scaleFactor;
+  };
+
+  self.getHeight = function() {
+    return sceneHeight / scaleFactor;
+  };
+
+  self.getScaleFactor = function() {
+    return scaleFactor;
+  };
+
   var renderEntity = function (context, i) {
     var entity = entities[i];
-    context.fillRect(entity.x, entity.y, depth, entity.width, entity.height, entity.material);
+   // TODO: Bad, bad bad   
+    entity.render(context);
   };
 };
 

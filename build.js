@@ -1,6 +1,7 @@
 var fs = require('fs');
 
 var inputFiles = [
+  "src/entity.js",
   "src/camera.js",
   "src/rendertarget.js" ,
   "src/effectbuilder.js" ,
@@ -11,7 +12,9 @@ var inputFiles = [
   "src/webglrenderstage.js" ,
   "src/layer.js" ,
   "src/world.js" ,
-  "src/game.js"
+  "src/game.js",
+  "src/engine.js",
+  "src/enginebuilder.js"
 ];
 
 // TODO: Discuss strategy for dealing with modules in a purely client-side system
