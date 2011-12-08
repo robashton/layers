@@ -1,4 +1,4 @@
-var World = function (sceneWidth, sceneHeight, nearestPoint) {
+var World = function (sceneWidth, sceneHeight, nearestPoint, renderScaleFactor) {
   var self = this;
   var layers = [];
 
@@ -8,8 +8,16 @@ var World = function (sceneWidth, sceneHeight, nearestPoint) {
   };
 
   self.addLayer = function(distance) {
-    var scaleFactor = distance / nearestPoint;
-    var layer = new Layer(distance, scaleFactor, sceneWidth, sceneHeight);
+    var distanceScaleFactor = distance / nearestPoint;
+
+    var layer = new Layer({
+      distance: distance,
+      distanceScaleFactor: distanceScaleFactor,
+      renderScaleFactor: distanceScaleFactor * renderScaleFactor,
+      sceneWidth: sceneWidth,
+      sceneHeight: sceneHeight
+    });
+
     layers.push(layer);
     return layer;
   };

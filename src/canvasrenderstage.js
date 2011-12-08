@@ -9,6 +9,11 @@ var CanvasRenderStage = function (colourElement, depthElement, nearestPoint) {
     fillDepthBuffer(x, y, z, width, height);
   };
 
+  self.translate = function(x,  y) {
+    colourBuffer.translate(x,y);
+    depthBuffer.translate(x,y);
+  };
+
   var fillColourBuffer = function (x, y, z, width, height, material) {
     colourBuffer.setFillColor(material.rgba());
 

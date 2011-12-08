@@ -1,7 +1,7 @@
 var fs = require('fs');
 
 var inputFiles = [
-  "src/entity.js",
+  "src/renderable.js",
   "src/camera.js",
   "src/rendertarget.js" ,
   "src/effectbuilder.js" ,

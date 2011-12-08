@@ -1,18 +1,18 @@
 var Square = function(x,y, width, height, material, layer) {
   var self = this;
 
-  var entity = new Entity(x, y, width, height, material);
-  layer.addEntity(entity);
+  var item = new Renderable(x, y, width, height, material);
+  layer.addRenderable(item);
 
   self.renderable = function() {
-    return entity;
+    return item;
   };
 
   self.doLogic = function() {
     x += 2;
     if(x > layer.getWidth())
       x = 0 - width;
-    entity.position(x, y);  
+    item.position(x, y);  
   };
 };
 
@@ -26,8 +26,6 @@ var Game = function () {
                     .build();
 
   var world = engine.world();
-
-    
                   
   var backdrop = world.addLayer(1.0);
   var middle1 = world.addLayer(3.0);

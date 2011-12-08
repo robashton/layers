@@ -1,7 +1,9 @@
 var Engine = function(config) {     
   var self = this;
+
+  var baseScaleFactor = config.colourElement.width / config.sceneWidth;
      
-  var world = new World(config.sceneWidth, config.sceneHeight, config.nearestPoint);
+  var world = new World(config.sceneWidth, config.sceneHeight, config.nearestPoint, baseScaleFactor);
   var canvasRenderStage = new CanvasRenderStage(config.colourElement, config.depthElement, config.nearestPoint);
   var webglRenderStage = new WebglRenderStage(config.glElement);
 

@@ -1,4 +1,4 @@
-var Entity = function(x, y, width, height, material) {
+var Renderable = function(x, y, width, height, material) {
   var self = this;
 
   var rx = 0;
@@ -25,12 +25,12 @@ var Entity = function(x, y, width, height, material) {
   };
 
   var updateRenderCoords = function() {
-    rx = x * layer.getScaleFactor();
-    ry = y * layer.getScaleFactor();
+    rx = x * layer.getRenderScaleFactor();
+    ry = y * layer.getRenderScaleFactor();
   };
 
   var updateRenderSize = function() {
-    rwidth = width * layer.getScaleFactor();
-    rheight = height * layer.getScaleFactor();
+    rwidth = width * layer.getRenderScaleFactor();
+    rheight = height * layer.getRenderScaleFactor();
   };
 };
