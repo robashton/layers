@@ -11,7 +11,7 @@ var World = function (sceneWidth, sceneHeight, nearestPoint, renderScaleFactor) 
     var distanceScaleFactor = distance / nearestPoint;
 
     var layer = new Layer({
-      distance: distance,
+      depth: distance,
       distanceScaleFactor: distanceScaleFactor,
       renderScaleFactor: distanceScaleFactor * renderScaleFactor,
       sceneWidth: sceneWidth,

@@ -11,6 +11,8 @@ var WebglRenderer = function (target, shaderFactory) {
 
   var effects = [];
 
+  var colourInput = null;
+  var depthInput = null;
   var currentColourInput = null;
   var currentDepthInput = null;
   var memoryTargetOne = null;
@@ -21,11 +23,11 @@ var WebglRenderer = function (target, shaderFactory) {
     if(effects.length === 0)
       throw "No effects were specified before calling render!";
 
-    var canvasColourTexture =  createTextureFromCanvas(colourCanvas);
-    var canvasDepthTexture =  createTextureFromCanvas(colourCanvas);
+    fillTextureFromCanvas(colourInput, colourCanvas);
+    fillTextureFromCanvas(depthInput, depthCanvas);
 
-    currentColourInput = canvasColourTexture;
-    currentDepthInput = canvasDepthTexture;
+    currentColourInput = colourInput;
+    currentDepthInput = depthInput;
     var currentRenderTarget = effects.length === 1 ? screenTarget : memoryTargetOne;
 
     for(var i = 0; i < effects.length; i++) {
@@ -38,9 +40,6 @@ var WebglRenderer = function (target, shaderFactory) {
         currentRenderTarget = i === (effects.length-2) ? screenTarget : (currentRenderTarget === memoryTargetOne ? memoryTargetTwo : memoryTargetOne);       
       }
     }   
-    
-    gl.deleteTexture(canvasColourTexture);
-    gl.deleteTexture(canvasDepthTexture);
   };
 
   var renderPass = function(effect) {
@@ -63,6 +62,8 @@ var WebglRenderer = function (target, shaderFactory) {
   };
 
   var createRenderTargets = function() {
+    colourInput = createTextureForCopyingInto();
+    depthInput = createTextureForCopyingInto();
     memoryTargetOne = new RenderTarget(gl, renderWidth, renderHeight);
     memoryTargetTwo = new RenderTarget(gl, renderWidth, renderHeight);
     screenTarget = new ScreenRenderTarget(gl);
@@ -89,15 +90,20 @@ var WebglRenderer = function (target, shaderFactory) {
     effects.push(effect);
   };
 
-  var createTextureFromCanvas = function (canvasElement) {
+  var createTextureForCopyingInto = function() {
     var texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, canvasElement);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.bindTexture(gl.TEXTURE_2D, null);
     return texture;
+  };
+
+  var fillTextureFromCanvas = function (texture, canvasElement) {
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, canvasElement);
   };
 
   var createGlContext = function () {
