@@ -14,6 +14,15 @@ var Layer = function (config) {
     renderable.setLayer(self);
   };
 
+  self.removeRenderable = function(renderable) {
+    var newItems = [];
+    for(var i = 0; i < items.length; i++) {
+        if(renderable !== items[i])
+          newItems.push(items[i]);
+    }
+    items = newItems;
+  };
+
   self.render = function (context) {
     for (var i = 0; i < items.length; i++)
       renderItem(context, i);
@@ -21,6 +30,14 @@ var Layer = function (config) {
 
   self.getDepth = function() {
     return depth;
+  };
+
+  self.getRight = function() {
+    return self.getWidth() - transformX;
+  };
+
+  self.getLeft = function() {
+    return -transformX;
   };
 
   self.getWidth = function() {
