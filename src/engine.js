@@ -11,7 +11,7 @@ var Engine = function(config) {
     webglRenderStage = new WebglRenderStage(config.glElement);
 
   self.render = function() {
-    canvasRenderStage.fillRect(0, 0, 0, config.colourElement.width, config.colourElement.height, backFillMaterial);
+    canvasRenderStage.fillRect(0, 0, 0, 0, config.colourElement.width, config.colourElement.height, backFillMaterial);
     world.render(canvasRenderStage);
     if(webglRenderStage)
       webglRenderStage.renderScene(config.colourElement, config.depthElement);

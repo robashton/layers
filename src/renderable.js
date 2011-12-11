@@ -7,6 +7,7 @@ var Renderable = function(x, y, width, height, material) {
   var rwidth = 0;
   var rheight = 0;
   var layer = null;
+  var rotation = 0;
 
   self.setLayer = function(nlayer) {
     layer = nlayer;
@@ -20,8 +21,12 @@ var Renderable = function(x, y, width, height, material) {
     updateRenderCoords();
   };
 
+  self.rotation = function(value) {
+    rotation = value;
+  };
+
   self.render = function(context) {
-    context.fillRect(rx, ry, layer.getDepth(), rwidth, rheight, material)
+    context.fillRect(rx, ry, layer.getDepth(), rotation, rwidth, rheight, material)
   };
 
   var updateRenderCoords = function() {

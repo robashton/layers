@@ -4,28 +4,46 @@ var CanvasRenderStage = function (colourElement, depthElement, nearestPoint) {
   var colourBuffer = null;
   var depthBuffer = null;
 
-  self.fillRect = function (x, y, z, width, height, material) {
-    fillColourBuffer(x, y, z, width, height, material);
-    fillDepthBuffer(x, y, z, width, height, material);
+  var currentTranslation = [0,0];
+
+  self.fillRect = function (x, y, z, rotation, width, height, material) {
+    fillColourBuffer(x, y, z, rotation, width, height, material);
+    fillDepthBuffer(x, y, z, rotation, width, height, material);
   };
 
-  self.translate = function(x,  y) {
-    colourBuffer.translate(x,y);
-    if(depthBuffer)
-      depthBuffer.translate(x,y);
+  self.translate = function(x, y) {
+    currentTranslation[0] = x;
+    currentTranslation[1] = y;
   };
 
-  var fillColourBuffer = function (x, y, z, width, height, material) {
+  var fillColourBuffer = function (x, y, z, rotation, width, height, material) {
     colourBuffer.setFillColor(material.rgba());
+    applyTransforms(colourBuffer, x, y, rotation, width, height);
 
     if(material.image()) {
       colourBuffer.drawImage(material.image(), x, y, width, height);
     } else {
       colourBuffer.fillRect(x, y, width, height);
     }
+    clearTransforms(colourBuffer);
   };
 
-  var fillDepthBuffer = function (x, y, z, width, height, material) {
+  var applyTransforms = function(ctx, x, y, rotation, width, height) {
+    var middlex = x + (width / 2.0) - currentTranslation[0];
+    var middley = y + (width / 2.0) -currentTranslation[1];
+  
+    ctx.save();
+    ctx.translate(middlex, middley);
+    ctx.rotate(rotation);
+    ctx.translate(-middlex, -middley);
+    ctx.translate(-currentTranslation[0], -currentTranslation[1]);
+  };
+
+  var clearTransforms = function(ctx) {
+    ctx.restore();
+  };
+
+  var fillDepthBuffer = function (x, y, z, rotation, width, height, material) {
     if(!depthBuffer) return;
     var depthComponent = (z / nearestPoint);
     depthBuffer.globalAlpha = depthComponent;    

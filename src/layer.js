@@ -24,8 +24,10 @@ var Layer = function (config) {
   };
 
   self.render = function (context) {
+    context.translate(transformX * renderScaleFactor, 0);
     for (var i = 0; i < items.length; i++)
       renderItem(context, i);
+    context.translate(0, 0);
   };
 
   self.getDepth = function() {
@@ -33,11 +35,11 @@ var Layer = function (config) {
   };
 
   self.getRight = function() {
-    return self.getWidth() - transformX;
+    return self.getWidth() + transformX;
   };
 
   self.getLeft = function() {
-    return -transformX;
+    return transformX;
   };
 
   self.getWidth = function() {
@@ -56,12 +58,15 @@ var Layer = function (config) {
     transformX = x;
   };
 
+  self.browserToGameWorld = function(points) {
+    points[0] = transformX + (points[0] / renderScaleFactor);
+    points[1] = (points[1] / renderScaleFactor);
+    return points;
+  };
+
   var renderItem = function (context, i) {
-    var item = items[i];
-    
-    context.translate(transformX * renderScaleFactor, 0);
+    var item = items[i];   
     item.render(context);
-    context.translate(-transformX * renderScaleFactor, 0);
   };
 };
 
