@@ -43,5 +43,6 @@ var buildAllFiles = function(callback) {
 exports.go = function() {
   buildAllFiles(function() {
     fs.writeFile('lib/layers.js', outputText);
+    fs.writeFile('../planethinking/site/libs/layers.js', outputText);
   });
 };

@@ -14,10 +14,9 @@ var Material = function(r, g, b) {
       parseInt(b * scaleFactor));
   };
 
-  self.setImage = function(url) {
-    image = new Image();
-    image.src = url;
+  self.setImage = function(img) {
+    image = img;
   };
 
-  self.image = function() { return image; }
+  self.image = function() { return image ? image.get() : null; }
 };
