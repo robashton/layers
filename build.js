@@ -15,7 +15,16 @@ var inputFiles = [
   "src/world.js" ,
   "src/game.js",
   "src/engine.js",
-  "src/enginebuilder.js"
+  "src/enginebuilder.js",
+  "src/eventable.js",
+  "src/entity.js",
+  "src/scene.js",
+  "src/particles.js",
+  "src/resourceloader.js",
+  "src/sound.js",
+  "src/soundhandler.js",
+  "src/texture.js",
+  "src/texturehandler.js"
 ];
 
 // TODO: Discuss strategy for dealing with modules in a purely client-side system
