@@ -1,13 +1,15 @@
-var TextureHandler = function() {
-  Eventable.call(this);
-  
-  var self = this;
+define(['./texture'], function(Texture) {
+  return function() {   
+    var self = this;
 
-  self.handles = function(url) {
-    return url.indexOf('.png') > 0;
+    self.handles = function(url) {
+      return url.indexOf('.png') > 0;
+    };
+    
+    self.get = function(url) {
+      return new Texture(url);
+    };
   };
-  
-  self.get = function(url) {
-    return new Texture(url);
-  };
-};
+});
+
+
