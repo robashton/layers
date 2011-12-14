@@ -1,4 +1,4 @@
-define(['./engine'], function(Engine) {
+define(['./renderengine'], function(Engine) {
 
   return function(colourId, depthId, webglId) {
     var self = this;

@@ -1,4 +1,4 @@
-define(['./entity'], function(Entity) {
+define(['../scene/entity'], function(Entity) {
  return function(depth, config) {
     Entity.call(this); var self = this;
 

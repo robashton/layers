@@ -1,4 +1,4 @@
-define(['./eventable'], function(Eventable) {
+define(['../shared/eventable'], function(Eventable) {
   return function(url) {
     Eventable.call(this);  
 

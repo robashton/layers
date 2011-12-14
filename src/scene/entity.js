@@ -1,4 +1,4 @@
-define(['./eventable'], function(Eventable) {
+define(['../shared/eventable'], function(Eventable) {
   return function() {
     Eventable.call(this); var self = this;
     var scene = null;

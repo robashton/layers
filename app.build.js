@@ -1,18 +1,11 @@
 ({
     appDir: "./src",
     baseUrl: "./",
-    dir: "./appdirectory-build",
+    dir: "./build",
     modules: [
         {
-            name: "enginebuilder"
-        },
-        {
-            name: "entity"
-        },
-        {
-            name: "scene"
+            name: "driver"
         }
     ],
-    optimize: "none",
-    wrap: true
+    optimize: "none"
 })

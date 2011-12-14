@@ -1,4 +1,5 @@
-define(function() {
+define(['./rendertarget', './screenrendertarget', './effectbuilder'], 
+function(RenderTarget, ScreenRenderTarget, EffectBuilder) {
   return function (target, shaderFactory) {
     var self = this;
 
