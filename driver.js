@@ -3,8 +3,20 @@ define(function(require) {
   var SoundHandler = require('./resources/soundhandler');
   var ResourceLoader = require('./resources/resourceloader');
   var Scene = require('./scene/scene');
-  var EngineBuilder = require('render/renderenginebuilder');
-    
+  var EngineBuilder = require('./render/renderenginebuilder');
+  var Eventable = require('./shared/eventable');
+
+  var findRequestAnimationFrame = function() {
+    return window.requestAnimationFrame        || 
+      window.webkitRequestAnimationFrame  || 
+      window.mozRequestAnimationFrame     || 
+      window.oRequestAnimationFrame       || 
+      window.msRequestAnimationFrame      ||
+      function(callback, element){
+        window.setTimeout(callback, 1000 / 30);
+      };
+  };  
+
   return function() {
     Eventable.call(this);
 
@@ -53,6 +65,10 @@ define(function(require) {
       renderScene();
     };
 
+    var doLogic = function() {
+      scene.tick();
+    };
+
     var renderScene = function() {
       if(engine === null) return;
       engine.render();
@@ -63,18 +79,6 @@ define(function(require) {
       clearInterval(tickTimerId);
       tickTimerId = null;
     };
-
-    var findRequestAnimationFrame = function() {
-      return  
-        window.requestAnimationFrame        || 
-        window.webkitRequestAnimationFrame  || 
-        window.mozRequestAnimationFrame     || 
-        window.oRequestAnimationFrame       || 
-        window.msRequestAnimationFrame      ||
-        function(callback, element){
-          window.setTimeout(callback, 1000 / 30);
-        };
-    };  
   };
 
 });
