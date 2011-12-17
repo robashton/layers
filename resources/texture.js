@@ -7,9 +7,10 @@ define(['../shared/eventable'], function(Eventable) {
 
     self.load = function() {
       image = new Image();
+      image.onload = onInitialLoadCompleted;
       image.src = url;
-      image.loadeddata = onInitialLoadCompleted;
     };
+
 
     self.get = function() {
       return image;

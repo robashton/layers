@@ -11,7 +11,8 @@ define(function(require) {
         renderScaleFactor = config.renderScaleFactor,
         sceneWidth = config.sceneWidth,
         sceneHeight = config.sceneHeight,
-        transformX = 0;
+        transformX = 0,
+        transformY = 0;
 
     self.addRenderable = function (renderable) {
       items.push(renderable);
@@ -28,7 +29,7 @@ define(function(require) {
     };
 
     self.render = function (context) {
-      context.translate(transformX * renderScaleFactor, 0);
+      context.translate(transformX * renderScaleFactor, transformY * renderScaleFactor);
       for (var i = 0; i < items.length; i++)
         renderItem(context, i);
       context.translate(0, 0);
@@ -63,9 +64,14 @@ define(function(require) {
       self.raise('onTransformed', { x: x });
     };
 
+    self.transformY = function(y) {
+      transformY = y;
+      self.raise('onTransformed', { y: y });
+    };
+
     self.browserToGameWorld = function(points) {
       points[0] = transformX + (points[0] / renderScaleFactor);
-      points[1] = (points[1] / renderScaleFactor);
+      points[1] = transformY + (points[1] / renderScaleFactor);
       return points;
     };
 
