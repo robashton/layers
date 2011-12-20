@@ -1,4 +1,6 @@
-This is an experiment that might turn into a little library for folk (including myself) to use in creating 2D parallax scrolling games with WebGL to perform progressive enhancement on top.
+This was an experiment for use in creating 2D parallax scrolling games with WebGL to perform progressive enhancement on top.
+
+This will be updated once I pull the latest version from my latest project.
 
 So far it includes
 
@@ -16,5 +18,3 @@ The library is actually written into several components intentionally, there is
 - Components, built on top of Scene and Render, currently containing particles, although they may end up losing their dependency on Scene
 - Driver, using all the things to help bootstrap a game, this is what I use to run my games, but the other bits can be used independently
 
-I may end up formally separating all of this into different libraries, and bringing them together into a framework so appropriate bits can be used
-for appropriate purposes without having to become a "Layers App"
